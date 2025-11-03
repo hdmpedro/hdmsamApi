@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
@@ -23,4 +24,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.transacoes WHERE u.id = :id")
     Optional<Usuario> findByIdWithTransacoes(@Param("id") UUID id);
+
+    List<Usuario> findByNomeContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            String nome, String email
+    );
 }

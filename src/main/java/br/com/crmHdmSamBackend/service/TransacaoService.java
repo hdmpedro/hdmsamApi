@@ -208,4 +208,30 @@ public class TransacaoService {
     }
 
 
+    public Transacao save(Transacao transacao) {
+        return transacaoRepository.save(transacao);
+    }
+
+
+    public List<Transacao> findAll() {
+        return transacaoRepository.findAll();
+    }
+
+
+
+    public void delete(Transacao transacao) {
+        transacaoRepository.delete(transacao);
+    }
+
+    public List<Transacao> findByDescricaoContaining(String descricao) {
+        return transacaoRepository.findByDescricaoContainingIgnoreCase(descricao);
+    }
+
+    public List<Transacao> findByTipo(TipoTransacao tipo) {
+        return transacaoRepository.findByTipo(tipo);
+    }
+
+    public List<Transacao> findByStatus(StatusTransacao status) {
+        return transacaoRepository.findByStatus(status);
+    }
 }
