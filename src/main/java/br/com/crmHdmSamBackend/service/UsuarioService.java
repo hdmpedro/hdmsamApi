@@ -21,7 +21,6 @@ public class UsuarioService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // ✅ MÉTODOS PARA DTOs (API REST)
     public List<UsuarioDTO> findAll() {
         return usuarioRepository.findAll()
                 .stream()
@@ -87,13 +86,11 @@ public class UsuarioService {
         );
     }
 
-    // ✅ MÉTODOS PARA VAADIN (trabalham com entidades diretas)
     public List<Usuario> findAllUsuarios() {
         return usuarioRepository.findAll();
     }
 
     public Usuario save(Usuario usuario) {
-        // Validação de email duplicado apenas para novos usuários
         if (usuario.getId() == null && usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new EmailAlreadyExistsException(usuario.getEmail());
         }

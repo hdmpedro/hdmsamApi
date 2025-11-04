@@ -53,7 +53,7 @@ public class UsuarioListView extends VerticalLayout {
         configureForm();
 
         add(getToolbar(), getContent());
-        updateList(); // ✅ CARREGA OS DADOS
+        updateList();
         closeEditor();
     }
 
@@ -99,7 +99,7 @@ public class UsuarioListView extends VerticalLayout {
         filterText.setPrefixComponent(VaadinIcon.SEARCH.create());
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
-        filterText.addValueChangeListener(e -> updateList()); // ✅ FILTRO FUNCIONAL
+        filterText.addValueChangeListener(e -> updateList()); 
 
         Button addButton = new Button("Novo Usuário");
         addButton.setIcon(VaadinIcon.PLUS.create());
@@ -134,7 +134,6 @@ public class UsuarioListView extends VerticalLayout {
         editUsuario(new Usuario());
     }
 
-    // ✅ SALVAR FUNCIONAL
     private void saveUsuario(Usuario usuario) {
         try {
             usuarioService.save(usuario);
@@ -153,7 +152,6 @@ public class UsuarioListView extends VerticalLayout {
         }
     }
 
-    // ✅ DELETAR FUNCIONAL
     private void deleteUsuario(Usuario usuario) {
         try {
             if (usuario.getId() != null) {
@@ -174,7 +172,6 @@ public class UsuarioListView extends VerticalLayout {
         }
     }
 
-    // ✅ ATUALIZAR LISTA FUNCIONAL
     private void updateList() {
         try {
             String searchTerm = filterText.getValue();

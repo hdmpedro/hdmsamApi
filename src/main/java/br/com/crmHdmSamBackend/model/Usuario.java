@@ -35,6 +35,12 @@ public class Usuario {
     @Column(name = "criado_em", nullable = false, updatable = false)
     private OffsetDateTime criadoEm;
 
+    @Column(name = "login")
+    private String login;
+
+    @Column(name = "senha")
+    private String senha;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Categoria> categorias = new ArrayList<>();
 
@@ -42,6 +48,16 @@ public class Usuario {
     private List<Transacao> transacoes = new ArrayList<>();
 
     public Usuario() {
+    }
+
+    public Usuario(UUID id, String nome, String email, String telefone, OffsetDateTime criadoEm, String login, String senha) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
+        this.criadoEm = criadoEm;
+        this.login = login;
+        this.senha = senha;
     }
 
     public Usuario(UUID id, String nome, String email, String telefone, OffsetDateTime criadoEm) {
@@ -119,6 +135,22 @@ public class Usuario {
 
     public void setTransacoes(List<Transacao> transacoes) {
         this.transacoes = transacoes;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 
     @Override

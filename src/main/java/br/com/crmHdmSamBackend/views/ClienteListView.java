@@ -48,7 +48,6 @@ public class ClienteListView extends VerticalLayout {
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
 
-        // Colunas
         grid.addColumn(Usuario::getId)
                 .setHeader("ID")
                 .setWidth("80px")
@@ -74,7 +73,6 @@ public class ClienteListView extends VerticalLayout {
         grid.addColumn(cliente -> 1 > 0 ? "Sim" : "Não")
                 .setHeader("Ativo");
 
-        // Coluna de ações
         grid.addComponentColumn(cliente -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addThemeVariants(ButtonVariant.LUMO_SMALL);

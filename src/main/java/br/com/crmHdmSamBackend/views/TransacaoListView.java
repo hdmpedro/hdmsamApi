@@ -49,7 +49,7 @@ import java.util.Locale;
 
 @Route(value = "transacoes", layout = MainLayout.class)
 @PageTitle("Transações | FinanceApp")
-@PermitAll // ou outra anotação de segurança se tiver
+@PermitAll
 public class TransacaoListView extends VerticalLayout {
 
     private Grid<Transacao> grid = new Grid<>(Transacao.class, false);
@@ -58,10 +58,8 @@ public class TransacaoListView extends VerticalLayout {
     private ComboBox<StatusTransacao> statusFilter = new ComboBox<>();
     private TransacaoForm form;
 
-    // INJEÇÃO DO SERVICE
     private final TransacaoService transacaoService;
 
-    // CONSTRUTOR COM INJEÇÃO DE DEPENDÊNCIA
     public TransacaoListView(TransacaoService transacaoService) {
         this.transacaoService = transacaoService;
 
@@ -72,7 +70,7 @@ public class TransacaoListView extends VerticalLayout {
         configureForm();
 
         add(getToolbar(), getContent());
-        updateList(); // CARREGA OS DADOS
+        updateList();
         closeEditor();
     }
 
@@ -181,11 +179,10 @@ public class TransacaoListView extends VerticalLayout {
         editTransacao(new Transacao());
     }
 
-    // MÉTODO QUE SALVA NO BANCO
     private void saveTransacao(Transacao transacao) {
         try {
-            transacaoService.save(transacao); // SALVA NO BANCO
-            updateList(); // ATUALIZA A LISTA
+            transacaoService.save(transacao);
+            updateList();
             closeEditor();
 
             Notification notification = Notification.show("Transação salva com sucesso!");
@@ -198,11 +195,10 @@ public class TransacaoListView extends VerticalLayout {
         }
     }
 
-    // MÉTODO QUE DELETA DO BANCO
     private void deleteTransacao(Transacao transacao) {
         try {
-            transacaoService.delete(transacao); // DELETA DO BANCO
-            updateList(); // ATUALIZA A LISTA
+            transacaoService.delete(transacao);
+            updateList();
             closeEditor();
 
             Notification notification = Notification.show("Transação deletada com sucesso!");
@@ -215,14 +211,12 @@ public class TransacaoListView extends VerticalLayout {
         }
     }
 
-    // MÉTODO QUE CARREGA OS DADOS DO BANCO
     private void updateList() {
         try {
             String searchTerm = filterText.getValue();
             TipoTransacao tipo = tipoFilter.getValue();
             StatusTransacao status = statusFilter.getValue();
 
-            // BUSCA NO BANCO COM FILTROS
             if (searchTerm != null && !searchTerm.isEmpty()) {
                 grid.setItems(transacaoService.findByDescricaoContaining(searchTerm));
             } else if (tipo != null) {
@@ -230,7 +224,7 @@ public class TransacaoListView extends VerticalLayout {
             } else if (status != null) {
                 grid.setItems(transacaoService.findByStatus(status));
             } else {
-                grid.setItems(transacaoService.findAll()); // BUSCA TUDO
+                grid.setItems(transacaoService.findAll());
             }
         } catch (Exception e) {
             Notification notification = Notification.show("Erro ao carregar dados: " + e.getMessage());
