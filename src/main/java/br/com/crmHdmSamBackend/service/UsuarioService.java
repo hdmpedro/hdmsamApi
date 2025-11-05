@@ -5,9 +5,12 @@ import br.com.crmHdmSamBackend.exception.*;
 import br.com.crmHdmSamBackend.model.*;
 import br.com.crmHdmSamBackend.model.dto.UsuarioDTO;
 import br.com.crmHdmSamBackend.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,10 +19,15 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    @Autowired
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
+    // ==================== MÉTODOS COM DTO ====================
 
     public List<UsuarioDTO> findAll() {
         return usuarioRepository.findAll()
@@ -69,25 +77,22 @@ public class UsuarioService {
         return toDTO(updated);
     }
 
-    public void delete(UUID id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuário não encontrado com ID: " + id);
-        }
-        usuarioRepository.deleteById(id);
-    }
-
-    private UsuarioDTO toDTO(Usuario usuario) {
-        return new UsuarioDTO(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getTelefone(),
-                usuario.getCriadoEm()
-        );
-    }
+    // ==================== MÉTODOS COM ENTIDADE ====================
 
     public List<Usuario> findAllUsuarios() {
         return usuarioRepository.findAll();
+    }
+
+    public Optional<Usuario> findUsuarioById(UUID id) {
+        return usuarioRepository.findById(id);
+    }
+
+    public Optional<Usuario> findByLogin(String login) {
+        return usuarioRepository.findByLogin(login);
+    }
+
+    public Optional<Usuario> findUsuarioByEmail(String email) {
+        return usuarioRepository.findByEmail(email);
     }
 
     public Usuario save(Usuario usuario) {
@@ -100,6 +105,53 @@ public class UsuarioService {
     public List<Usuario> findByNomeOrEmail(String searchTerm) {
         return usuarioRepository.findByNomeContainingIgnoreCaseOrEmailContainingIgnoreCase(
                 searchTerm, searchTerm
+        );
+    }
+
+    // ==================== MÉTODOS DE SENHA ====================
+
+    public Usuario criarComSenha(Usuario usuario, String senhaPlana) {
+        if (senhaPlana != null && !senhaPlana.isEmpty()) {
+            usuario.setSenha(passwordEncoder.encode(senhaPlana));
+        }
+        return usuarioRepository.save(usuario);
+    }
+
+    public void alterarSenha(UUID usuarioId, String novaSenha) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+    }
+
+    // ==================== MÉTODOS DE DELEÇÃO ====================
+
+    public void delete(UUID id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Usuário não encontrado com ID: " + id);
+        }
+        usuarioRepository.deleteById(id);
+    }
+
+    // ==================== MÉTODOS DE VALIDAÇÃO ====================
+
+    public boolean existsByLogin(String login) {
+        return usuarioRepository.existsByLogin(login);
+    }
+
+    public boolean existsByEmail(String email) {
+        return usuarioRepository.existsByEmail(email);
+    }
+
+    // ==================== MÉTODO AUXILIAR ====================
+
+    private UsuarioDTO toDTO(Usuario usuario) {
+        return new UsuarioDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getTelefone(),
+                usuario.getCriadoEm()
         );
     }
 }

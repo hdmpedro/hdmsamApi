@@ -15,9 +15,12 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 
 @Route(value = "categorias", layout = MainLayout.class)
 @PageTitle("Categorias | FinanceApp")
+@RolesAllowed("USER")
+
 public class CategoriaListView extends VerticalLayout {
 
     private Grid<Categoria> grid = new Grid<>(Categoria.class, false);

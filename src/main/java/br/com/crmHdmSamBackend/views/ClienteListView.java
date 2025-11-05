@@ -18,11 +18,13 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import jakarta.annotation.security.RolesAllowed;
 
 @SpringComponent
 @UIScope
 @Route(value = "clientes", layout = MainLayout.class)
 @PageTitle("Clientes | Sistema CRUD")
+@RolesAllowed("USER")
 public class ClienteListView extends VerticalLayout {
 
     private final UsuarioService service;

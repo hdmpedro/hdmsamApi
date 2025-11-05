@@ -75,7 +75,10 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
             @Param("metodo") String metodo
     );
 
+
     List<Transacao> findByDescricaoContainingIgnoreCase(String descricao);
     List<Transacao> findByTipo(TipoTransacao tipo);
     List<Transacao> findByStatus(StatusTransacao status);
+
+
 }

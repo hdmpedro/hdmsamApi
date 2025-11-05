@@ -43,13 +43,14 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 @Route(value = "transacoes", layout = MainLayout.class)
 @PageTitle("Transações | FinanceApp")
-@PermitAll
+@RolesAllowed("USER")
 public class TransacaoListView extends VerticalLayout {
 
     private Grid<Transacao> grid = new Grid<>(Transacao.class, false);

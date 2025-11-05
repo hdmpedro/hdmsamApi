@@ -9,9 +9,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.RolesAllowed;
 
-@Route(value = "", layout = MainLayout.class)
+@Route(value = "dashboard", layout = MainLayout.class)
 @PageTitle("Dashboard | FinanceApp")
+@RolesAllowed("USER")
 public class DashboardView extends VerticalLayout {
 
     public DashboardView() {

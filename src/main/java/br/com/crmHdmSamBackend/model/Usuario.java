@@ -11,6 +11,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
@@ -31,21 +44,65 @@ public class Usuario {
     @Column(name = "telefone")
     private String telefone;
 
-    @CreationTimestamp
-    @Column(name = "criado_em", nullable = false, updatable = false)
-    private OffsetDateTime criadoEm;
-
-    @Column(name = "login")
+    @NotBlank(message = "Login é obrigatório")
+    @Column(name = "login", nullable = false, unique = true)
     private String login;
 
     @Column(name = "senha")
     private String senha;
+
+    @CreationTimestamp
+    @Column(name = "criado_em", nullable = false, updatable = false)
+    private OffsetDateTime criadoEm;
+
+    @Column(name = "ultimo_login")
+    private OffsetDateTime ultimoLogin;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Categoria> categorias = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transacao> transacoes = new ArrayList<>();
+
+    @Column(name = "ativo")
+    private boolean ativo = true;
+
+    @Column(name = "tentativas_login")
+    private int tentativasLogin = 0;
+
+    @Column(name = "bloqueado_ate")
+    private OffsetDateTime bloqueadoAte;
+
+    @Column(name = "is_admin")
+    private boolean admin = false;
+
+    public boolean isBloqueado() {
+        if (bloqueadoAte == null) {
+            return false;
+        }
+        if (OffsetDateTime.now().isAfter(bloqueadoAte)) {
+            bloqueadoAte = null;
+            tentativasLogin = 0;
+            return false;
+        }
+        return true;
+    }
+
+    public void incrementarTentativasLogin() {
+        this.tentativasLogin++;
+        if (this.tentativasLogin >= 5) {
+            this.bloqueadoAte = OffsetDateTime.now().plusMinutes(15);
+        }
+    }
+
+    public void resetarTentativasLogin() {
+        this.tentativasLogin = 0;
+        this.bloqueadoAte = null;
+    }
+
+    public void atualizarUltimoLogin() {
+        this.ultimoLogin = OffsetDateTime.now();
+    }
 
     public Usuario() {
     }
@@ -81,77 +138,40 @@ public class Usuario {
         }
     }
 
-    public UUID getId() {
-        return id;
+    public boolean isAdmin() {
+        return admin;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public OffsetDateTime getCriadoEm() {
-        return criadoEm;
-    }
-
-    public void setCriadoEm(OffsetDateTime criadoEm) {
-        this.criadoEm = criadoEm;
-    }
-
-    public List<Categoria> getCategorias() {
-        return categorias;
-    }
-
-    public void setCategorias(List<Categoria> categorias) {
-        this.categorias = categorias;
-    }
-
-    public List<Transacao> getTransacoes() {
-        return transacoes;
-    }
-
-    public void setTransacoes(List<Transacao> transacoes) {
-        this.transacoes = transacoes;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public OffsetDateTime getCriadoEm() { return criadoEm; }
+    public void setCriadoEm(OffsetDateTime criadoEm) { this.criadoEm = criadoEm; }
+    public List<Categoria> getCategorias() { return categorias; }
+    public void setCategorias(List<Categoria> categorias) { this.categorias = categorias; }
+    public List<Transacao> getTransacoes() { return transacoes; }
+    public void setTransacoes(List<Transacao> transacoes) { this.transacoes = transacoes; }
+    public String getLogin() { return login; }
+    public void setLogin(String login) { this.login = login; }
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
+    public OffsetDateTime getUltimoLogin() { return ultimoLogin; }
+    public void setUltimoLogin(OffsetDateTime ultimoLogin) { this.ultimoLogin = ultimoLogin; }
+    public OffsetDateTime getBloqueadoAte() { return bloqueadoAte; }
+    public void setBloqueadoAte(OffsetDateTime bloqueadoAte) { this.bloqueadoAte = bloqueadoAte; }
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+    public int getTentativasLogin() { return tentativasLogin; }
+    public void setTentativasLogin(int tentativasLogin) { this.tentativasLogin = tentativasLogin; }
 
     @Override
     public boolean equals(Object o) {
@@ -166,4 +186,3 @@ public class Usuario {
         return Objects.hash(id);
     }
 }
-

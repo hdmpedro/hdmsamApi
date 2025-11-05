@@ -31,11 +31,14 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.time.format.DateTimeFormatter;
 
 @Route(value = "usuarios", layout = MainLayout.class)
 @PageTitle("Usuários | FinanceApp")
+@RolesAllowed("USER")
+
 public class UsuarioListView extends VerticalLayout {
 
     private Grid<Usuario> grid = new Grid<>(Usuario.class, false);
