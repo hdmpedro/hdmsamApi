@@ -38,19 +38,19 @@ public class UsuarioService {
 
     public UsuarioDTO findById(UUID id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + id));
         return toDTO(usuario);
     }
 
     public UsuarioDTO findByEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com email: " + email));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com email: " + email));
         return toDTO(usuario);
     }
 
     public UsuarioDTO create(UsuarioCreateDTO dto) {
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new EmailAlreadyExistsException(dto.getEmail());
+            throw new EmailJaExisteException(dto.getEmail());
         }
 
         Usuario usuario = new Usuario();
@@ -64,7 +64,7 @@ public class UsuarioService {
 
     public UsuarioDTO update(UUID id, UsuarioUpdateDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + id));
 
         if (dto.getNome() != null) {
             usuario.setNome(dto.getNome());
@@ -97,7 +97,7 @@ public class UsuarioService {
 
     public Usuario save(Usuario usuario) {
         if (usuario.getId() == null && usuarioRepository.existsByEmail(usuario.getEmail())) {
-            throw new EmailAlreadyExistsException(usuario.getEmail());
+            throw new EmailJaExisteException(usuario.getEmail());
         }
         return usuarioRepository.save(usuario);
     }
@@ -119,7 +119,7 @@ public class UsuarioService {
 
     public void alterarSenha(UUID usuarioId, String novaSenha) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId));
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
     }
@@ -128,7 +128,7 @@ public class UsuarioService {
 
     public void delete(UUID id) {
         if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuário não encontrado com ID: " + id);
+            throw new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + id);
         }
         usuarioRepository.deleteById(id);
     }

@@ -1,48 +1,23 @@
 package br.com.crmHdmSamBackend.views.login;
 
 
-import br.com.crmHdmSamBackend.service.AuthenticationService;
-import br.com.crmHdmSamBackend.views.MainLayout;
+import br.com.crmHdmSamBackend.security.service.AutenticacaoService;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import br.com.crmHdmSamBackend.service.AuthenticationService;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("login")
 //@Route("")
@@ -50,14 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 @AnonymousAllowed
 public class LoginView extends VerticalLayout {
 
-    private final AuthenticationService authenticationService;
+    private final AutenticacaoService autenticacaoService;
     private final TextField loginField;
     private final PasswordField passwordField;
     private final Button loginButton;
 
     @Autowired
-    public LoginView(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
+    public LoginView(AutenticacaoService autenticacaoService) {
+        this.autenticacaoService = autenticacaoService;
 
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -114,8 +89,8 @@ public class LoginView extends VerticalLayout {
         loginButton.setEnabled(false);
         loginButton.setText("Entrando...");
 
-        AuthenticationService.AuthenticationResult resultado =
-                authenticationService.autenticar(login, senha);
+        AutenticacaoService.AuthenticationResult resultado =
+                autenticacaoService.autenticar(login, senha);
         System.err.println("mensagem:"+resultado.getMensagem());
         System.err.println("usuario"+resultado.getUsuario());
         System.err.println("isSucesso"+resultado.isSucesso());

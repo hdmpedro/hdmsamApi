@@ -2,16 +2,14 @@ package br.com.crmHdmSamBackend.util;
 
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
 
-public class PasswordGenerator {
+public class GeradorSenha {
 
     public static void main(String[] args) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-        String senha = "admin123";
+        String senha = "admin@adm";
         String hashDoBanco = "$2a$12$4twRzUPimw.K4a8maPaw7.Uq4rdUYn0JXnrs7RwxtfDDRBrlZrToq";
 
         System.out.println("========================================");
@@ -26,13 +24,13 @@ public class PasswordGenerator {
         System.out.println();
 
         if (matches) {
-            System.out.println("✓✓✓ SUCESSO! A senha 'admin123' bate com o hash do banco!");
+            System.out.println("✓✓✓ SUCESSO! A senha: " +"'"+senha+"'" +" bate com o hash do banco!");
             System.out.println("✓✓✓ O problema está em outro lugar!");
         } else {
-            System.out.println("✗✗✗ FALHA! A senha 'admin123' NÃO bate com o hash do banco!");
+            System.out.println("✗✗✗ FALHA! A senha: " +"'"+senha+"'" +" NÃO bate com o hash do banco!");
             System.out.println("✗✗✗ O hash no banco pode estar corrompido!");
             System.out.println();
-            System.out.println("Gerando novo hash para 'admin123':");
+            System.out.println("Gerando novo hash para: "+senha);
             String novoHash = encoder.encode(senha);
             System.out.println(novoHash);
             System.out.println();

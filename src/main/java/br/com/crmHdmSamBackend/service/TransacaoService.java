@@ -4,7 +4,6 @@ import br.com.crmHdmSamBackend.model.Transacao;
 import br.com.crmHdmSamBackend.model.dto.*;
 import br.com.crmHdmSamBackend.exception.*;
 import br.com.crmHdmSamBackend.model.*;
-import br.com.crmHdmSamBackend.model.dto.UsuarioDTO;
 import br.com.crmHdmSamBackend.model.enums.StatusTransacao;
 import br.com.crmHdmSamBackend.model.enums.TipoTransacao;
 import br.com.crmHdmSamBackend.repository.TransacaoRepository;
@@ -72,13 +71,13 @@ public class TransacaoService {
 
     public TransacaoDTO findById(UUID id) {
         Transacao transacao = transacaoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada com ID: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Transação não encontrada com ID: " + id));
         return toDTO(transacao);
     }
 
     public TransacaoDTO create(UUID usuarioId, TransacaoCreateDTO dto) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId));
 
         Transacao transacao = new Transacao();
         transacao.setUsuario(usuario);
@@ -98,7 +97,7 @@ public class TransacaoService {
 
     public TransacaoDTO update(UUID id, TransacaoUpdateDTO dto) {
         Transacao transacao = transacaoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada com ID: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Transação não encontrada com ID: " + id));
 
         if (dto.getTelefone() != null) {
             transacao.setTelefone(dto.getTelefone());
@@ -129,7 +128,7 @@ public class TransacaoService {
 
     public void delete(UUID id) {
         if (!transacaoRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Transação não encontrada com ID: " + id);
+            throw new RecursoNaoEncontradoException("Transação não encontrada com ID: " + id);
         }
         transacaoRepository.deleteById(id);
     }
@@ -165,7 +164,7 @@ public class TransacaoService {
 
     private void validateUsuarioExists(UUID usuarioId) {
         if (!usuarioRepository.existsById(usuarioId)) {
-            throw new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId);
+            throw new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId);
         }
     }
 

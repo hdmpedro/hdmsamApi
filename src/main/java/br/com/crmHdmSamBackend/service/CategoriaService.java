@@ -3,7 +3,6 @@ package br.com.crmHdmSamBackend.service;
 import br.com.crmHdmSamBackend.model.dto.*;
 import br.com.crmHdmSamBackend.exception.*;
 import br.com.crmHdmSamBackend.model.*;
-import br.com.crmHdmSamBackend.model.dto.UsuarioDTO;
 import br.com.crmHdmSamBackend.model.enums.TipoTransacao;
 import br.com.crmHdmSamBackend.repository.CategoriaRepository;
 import br.com.crmHdmSamBackend.repository.UsuarioRepository;
@@ -43,16 +42,16 @@ public class CategoriaService {
 
     public CategoriaDTO findById(UUID id) {
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com ID: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada com ID: " + id));
         return toDTO(categoria);
     }
 
     public CategoriaDTO create(UUID usuarioId, CategoriaCreateDTO dto) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId));
 
         if (categoriaRepository.existsByUsuarioIdAndNome(usuarioId, dto.getNome())) {
-            throw new CategoriaAlreadyExistsException(dto.getNome());
+            throw new CategoriaJaExisteException(dto.getNome());
         }
 
         Categoria categoria = new Categoria();
@@ -67,12 +66,12 @@ public class CategoriaService {
 
     public CategoriaDTO update(UUID id, CategoriaUpdateDTO dto) {
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com ID: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada com ID: " + id));
 
         if (dto.getNome() != null) {
             if (categoriaRepository.existsByUsuarioIdAndNome(categoria.getUsuario().getId(), dto.getNome()) &&
                     !categoria.getNome().equals(dto.getNome())) {
-                throw new CategoriaAlreadyExistsException(dto.getNome());
+                throw new CategoriaJaExisteException(dto.getNome());
             }
             categoria.setNome(dto.getNome());
         }
@@ -86,7 +85,7 @@ public class CategoriaService {
 
     public void delete(UUID id) {
         if (!categoriaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Categoria não encontrada com ID: " + id);
+            throw new RecursoNaoEncontradoException("Categoria não encontrada com ID: " + id);
         }
         categoriaRepository.deleteById(id);
     }
@@ -98,7 +97,7 @@ public class CategoriaService {
 
     private void validateUsuarioExists(UUID usuarioId) {
         if (!usuarioRepository.existsById(usuarioId)) {
-            throw new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId);
+            throw new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + usuarioId);
         }
     }
 

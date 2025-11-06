@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Optional;
 
 @Component
-public class SessionManager implements Serializable {
+public class GerenciadorSessoes implements Serializable {
 
     private static final String USUARIO_SESSION_KEY = "USUARIO_AUTENTICADO";
 

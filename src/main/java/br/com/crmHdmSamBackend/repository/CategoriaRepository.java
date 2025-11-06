@@ -18,7 +18,7 @@ public interface CategoriaRepository extends JpaRepository<Categoria, UUID> {
 
     List<Categoria> findByUsuarioIdAndTipo(UUID usuarioId, TipoTransacao tipo);
 
-    
+
     Optional<Categoria> findByUsuarioIdAndNome(UUID usuarioId, String nome);
 
     @Query("SELECT c FROM Categoria c WHERE c.usuario.id = :usuarioId AND c.tipo = :tipo ORDER BY c.nome ASC")

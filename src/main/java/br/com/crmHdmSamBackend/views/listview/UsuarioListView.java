@@ -1,9 +1,9 @@
-package br.com.crmHdmSamBackend.views;
+package br.com.crmHdmSamBackend.views.listview;
 
 
 import br.com.crmHdmSamBackend.model.Usuario;
-import br.com.crmHdmSamBackend.model.enums.TipoTransacao;
 import br.com.crmHdmSamBackend.service.UsuarioService;
+import br.com.crmHdmSamBackend.views.MainLayout;
 import br.com.crmHdmSamBackend.views.form.UsuarioForm;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -16,21 +16,9 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import br.com.crmHdmSamBackend.model.Usuario;
-import br.com.crmHdmSamBackend.service.UsuarioService;
-import br.com.crmHdmSamBackend.views.form.UsuarioForm;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.Theme;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.time.format.DateTimeFormatter;

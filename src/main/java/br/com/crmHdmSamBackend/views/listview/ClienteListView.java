@@ -1,7 +1,8 @@
-package br.com.crmHdmSamBackend.views;
+package br.com.crmHdmSamBackend.views.listview;
 import br.com.crmHdmSamBackend.model.Usuario;
 
 import br.com.crmHdmSamBackend.service.UsuarioService;
+import br.com.crmHdmSamBackend.views.MainLayout;
 import br.com.crmHdmSamBackend.views.form.ClienteFormView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;

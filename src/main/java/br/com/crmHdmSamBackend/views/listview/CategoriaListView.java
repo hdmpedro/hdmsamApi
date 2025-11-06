@@ -1,8 +1,9 @@
-package br.com.crmHdmSamBackend.views;
+package br.com.crmHdmSamBackend.views.listview;
 
 
 import br.com.crmHdmSamBackend.model.Categoria;
 import br.com.crmHdmSamBackend.model.enums.TipoTransacao;
+import br.com.crmHdmSamBackend.views.MainLayout;
 import br.com.crmHdmSamBackend.views.form.CategoriaForm;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

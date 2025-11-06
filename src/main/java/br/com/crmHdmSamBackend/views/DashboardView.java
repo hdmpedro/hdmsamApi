@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.RolesAllowed;
 
@@ -22,6 +23,7 @@ public class DashboardView extends VerticalLayout {
 
         H2 title = new H2("Dashboard Financeiro");
         add(title);
+
 
         HorizontalLayout cardsLayout = new HorizontalLayout();
         cardsLayout.setWidthFull();

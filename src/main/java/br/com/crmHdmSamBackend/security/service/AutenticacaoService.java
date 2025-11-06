@@ -1,7 +1,8 @@
-package br.com.crmHdmSamBackend.service;
+package br.com.crmHdmSamBackend.security.service;
 import br.com.crmHdmSamBackend.model.Usuario;
 import br.com.crmHdmSamBackend.repository.UsuarioRepository;
-import br.com.crmHdmSamBackend.security.SessionManager;
+import br.com.crmHdmSamBackend.security.GerenciadorSessoes;
+import br.com.crmHdmSamBackend.util.IpUtils;
 import com.vaadin.flow.server.VaadinSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,79 +23,79 @@ import java.util.List;
 import java.util.Optional;
 
 
-import br.com.crmHdmSamBackend.model.Usuario;
-import br.com.crmHdmSamBackend.repository.UsuarioRepository;
-import br.com.crmHdmSamBackend.security.SessionManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-
-
 @Service
-public class AuthenticationService {
+public class AutenticacaoService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
+    private static final Logger log = LoggerFactory.getLogger(AutenticacaoService.class);
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
-    private final SessionManager sessionManager;
+    private final GerenciadorSessoes gerenciadorSessoes;
+    private final TentativaLoginService tentativaLoginService;
 
     @Autowired
-    public AuthenticationService(UsuarioRepository usuarioRepository,
-                                 PasswordEncoder passwordEncoder,
-                                 SessionManager sessionManager) {
+    public AutenticacaoService(UsuarioRepository usuarioRepository,
+                               PasswordEncoder passwordEncoder,
+                               GerenciadorSessoes gerenciadorSessoes,
+                               TentativaLoginService tentativaLoginService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
-        this.sessionManager = sessionManager;
+        this.gerenciadorSessoes = gerenciadorSessoes;
+        this.tentativaLoginService = tentativaLoginService;
         log.info("AuthenticationService inicializado com PasswordEncoder: {}", passwordEncoder.getClass().getName());
     }
 
     @Transactional
     public AuthenticationResult autenticar(String login, String senha) {
         log.info("=== INICIANDO AUTENTICAÇÃO ===");
+
+        String ipCliente = IpUtils.obterIpCliente();
+        log.info("IP do cliente: {}", ipCliente);
         log.info("Login recebido: '{}'", login);
         log.info("Senha recebida (length): {}", senha != null ? senha.length() : 0);
 
+        if (tentativaLoginService.isIpBloqueado(ipCliente)) {
+            log.warn("Tentativa de autenticação de IP BLOQUEADO: {}", ipCliente);
+            return AuthenticationResult.failure("Muitas tentativas de login. Aguarde alguns minutos.");
+        }
+
         if (login == null || login.trim().isEmpty() || senha == null || senha.isEmpty()) {
-            log.warn("Login ou senha vazios");
+            log.warn("Login ou senha vazios - IP: {}", ipCliente);
+            tentativaLoginService.registrarTentativaFalha(ipCliente);
             return AuthenticationResult.failure("Login e senha são obrigatórios");
         }
 
         Optional<Usuario> usuarioOpt = usuarioRepository.findByLogin(login.trim());
-
         if (usuarioOpt.isEmpty()) {
-            log.warn("Usuário não encontrado: '{}'", login);
+            log.warn("Usuário não encontrado: '{}' - IP: {}", login, ipCliente);
+            tentativaLoginService.registrarTentativaFalha(ipCliente);
             return AuthenticationResult.failure("Credenciais inválidas");
         }
 
         Usuario usuario = usuarioOpt.get();
         log.info("Usuário encontrado: {} (ID: {})", usuario.getNome(), usuario.getId());
-        log.info("Ativo: {} | Admin: {} | Tentativas: {}", usuario.isAtivo(), usuario.isAdmin(), usuario.getTentativasLogin());
+        log.info("Ativo: {} | Admin: {} | Tentativas usuário: {}", usuario.isAtivo(), usuario.isAdmin(), usuario.getTentativasLogin());
 
         if (!usuario.isAtivo()) {
-            log.warn("Usuário inativo: {}", login);
+            log.warn("Usuário inativo: {} - IP: {}", login, ipCliente);
+            tentativaLoginService.registrarTentativaFalha(ipCliente);
             return AuthenticationResult.failure("Usuário inativo");
         }
 
         if (usuario.isBloqueado()) {
-            log.warn("Usuário bloqueado: {} até {}", login, usuario.getBloqueadoAte());
-            return AuthenticationResult.failure("Usuário bloqueado temporariamente. Tente novamente mais tarde.");
+            log.warn("Usuário bloqueado: {} até {} - IP: {}", login, usuario.getBloqueadoAte(), ipCliente);
+            tentativaLoginService.registrarTentativaFalha(ipCliente);
+            return AuthenticationResult.failure("Usuário bloqueado..");
         }
 
         if (usuario.getSenha() == null) {
-            log.error("Usuário sem senha definida: {}", login);
+            log.error("Usuário sem senha definida: {} - IP: {}", login, ipCliente);
+            tentativaLoginService.registrarTentativaFalha(ipCliente);
             return AuthenticationResult.failure("Credenciais inválidas");
         }
 
         log.info("Hash da senha no banco: {}", usuario.getSenha());
         log.info("PasswordEncoder usado: {}", passwordEncoder.getClass().getName());
-        log.info("Senha digitada: '{}'", senha);
-
-        String testeHash = passwordEncoder.encode(senha);
-        log.info("Hash da senha digitada (teste): {}", testeHash);
 
         boolean senhaCorreta = passwordEncoder.matches(senha, usuario.getSenha());
         log.info("Resultado do matches: {}", senhaCorreta);
@@ -102,26 +103,33 @@ public class AuthenticationService {
         if (!senhaCorreta) {
             usuario.incrementarTentativasLogin();
             usuarioRepository.save(usuario);
-            log.warn("Senha incorreta para usuário: {} - Tentativas: {}/{}", login, usuario.getTentativasLogin(), 5);
+            tentativaLoginService.registrarTentativaFalha(ipCliente);
+
+            log.warn("Senha incorreta para usuário: {} - Tentativas usuário: {}/{} - IP: {}",
+                    login, usuario.getTentativasLogin(), 5, ipCliente);
 
             if (usuario.isBloqueado()) {
-                log.warn("Usuário bloqueado após {} tentativas: {}", usuario.getTentativasLogin(), login);
+                log.warn("Usuário bloqueado após {} tentativas: {} - IP: {}",
+                        usuario.getTentativasLogin(), login, ipCliente);
                 return AuthenticationResult.failure("Muitas tentativas incorretas. Usuário bloqueado por 15 minutos.");
             }
 
             return AuthenticationResult.failure("Credenciais inválidas");
         }
 
-        log.info("✓ Senha correta! Autenticando usuário: {}", login);
+        log.info("✓ Senha correta! Autenticando usuário: {} - IP: {}", login, ipCliente);
 
         usuario.resetarTentativasLogin();
         usuario.atualizarUltimoLogin();
         usuarioRepository.save(usuario);
         log.info("✓ Tentativas resetadas e último login atualizado");
 
-        sessionManager.setUsuarioAutenticado(usuario);
+        tentativaLoginService.registrarTentativaSucesso(ipCliente);
+        log.info("✓ Tentativas de IP resetadas para: {}", ipCliente);
+
+        gerenciadorSessoes.setUsuarioAutenticado(usuario);
         log.info("✓ Sessão criada para usuário: {}", login);
-        log.info("=== AUTENTICAÇÃO CONCLUÍDA COM SUCESSO ===");
+
         List<GrantedAuthority> authorities = new ArrayList<>();
         if (usuario.isAdmin()) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
@@ -149,30 +157,27 @@ public class AuthenticationService {
         }
 
         log.info("✓ Spring Security Context configurado com roles: {}", authorities);
-
         log.info("=== AUTENTICAÇÃO CONCLUÍDA COM SUCESSO ===");
 
         return AuthenticationResult.success(usuario);
     }
 
-
-
     public void logout() {
-        Optional<Usuario> usuario = sessionManager.getUsuarioAutenticado();
+        Optional<Usuario> usuario = gerenciadorSessoes.getUsuarioAutenticado();
         usuario.ifPresent(u -> log.info("Logout do usuário: {}", u.getLogin()));
-        sessionManager.logout();
+        gerenciadorSessoes.logout();
     }
 
     public Optional<Usuario> getUsuarioAutenticado() {
-        return sessionManager.getUsuarioAutenticado();
+        return gerenciadorSessoes.getUsuarioAutenticado();
     }
 
     public boolean isUsuarioAutenticado() {
-        return sessionManager.isUsuarioAutenticado();
+        return gerenciadorSessoes.isUsuarioAutenticado();
     }
 
     public boolean isUsuarioAdmin() {
-        return sessionManager.isUsuarioAdmin();
+        return gerenciadorSessoes.isUsuarioAdmin();
     }
 
     @Transactional

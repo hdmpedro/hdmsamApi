@@ -1,4 +1,4 @@
-package br.com.crmHdmSamBackend.security;
+package br.com.crmHdmSamBackend.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

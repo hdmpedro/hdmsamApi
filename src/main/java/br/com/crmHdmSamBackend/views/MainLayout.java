@@ -2,7 +2,11 @@ package br.com.crmHdmSamBackend.views;
 
 
 import br.com.crmHdmSamBackend.model.Usuario;
-import br.com.crmHdmSamBackend.service.AuthenticationService;
+import br.com.crmHdmSamBackend.security.service.AutenticacaoService;
+import br.com.crmHdmSamBackend.views.listview.CategoriaListView;
+import br.com.crmHdmSamBackend.views.listview.ClienteListView;
+import br.com.crmHdmSamBackend.views.listview.TransacaoListView;
+import br.com.crmHdmSamBackend.views.listview.UsuarioListView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H1;
@@ -12,52 +16,21 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.sidenav.SideNav;
-import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 
-import br.com.crmHdmSamBackend.security.SecurityService;
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.avatar.Avatar;
+import br.com.crmHdmSamBackend.security.service.SecurityService;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.sidenav.SideNav;
-import com.vaadin.flow.component.sidenav.SideNavItem;
-import com.vaadin.flow.theme.lumo.LumoUtility;
-
-
-import br.com.crmHdmSamBackend.model.Usuario;
-import br.com.crmHdmSamBackend.security.SecurityService;
-import br.com.crmHdmSamBackend.service.AuthenticationService;
-import br.com.crmHdmSamBackend.views.*;
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 
 public class MainLayout extends AppLayout {
 
     private final SecurityService securityService;
-    private final AuthenticationService authenticationService;
+    private final AutenticacaoService autenticacaoService;
 
-    public MainLayout(SecurityService securityService, AuthenticationService authenticationService) {
+    public MainLayout(SecurityService securityService, AutenticacaoService autenticacaoService) {
         this.securityService = securityService;
-        this.authenticationService = authenticationService;
+        this.autenticacaoService = autenticacaoService;
 
         createHeader();
         createDrawer();
@@ -75,7 +48,7 @@ public class MainLayout extends AppLayout {
                 .set("margin", "0")
                 .set("font-size", "var(--lumo-font-size-xl)");
 
-        Usuario usuario = authenticationService.getUsuarioAutenticado().orElse(null);
+        Usuario usuario = autenticacaoService.getUsuarioAutenticado().orElse(null);
         Span userInfo = new Span(usuario != null ? usuario.getNome() : "Usuário");
         userInfo.addClassNames(LumoUtility.FontWeight.MEDIUM);
         userInfo.getStyle().set("margin-right", "10px");

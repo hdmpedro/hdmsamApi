@@ -1,9 +1,10 @@
-package br.com.crmHdmSamBackend.views;
+package br.com.crmHdmSamBackend.views.listview;
 
 
 import br.com.crmHdmSamBackend.model.Transacao;
 import br.com.crmHdmSamBackend.model.enums.StatusTransacao;
 import br.com.crmHdmSamBackend.model.enums.TipoTransacao;
+import br.com.crmHdmSamBackend.views.MainLayout;
 import br.com.crmHdmSamBackend.views.form.TransacaoForm;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -22,31 +23,10 @@ import com.vaadin.flow.router.Route;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import br.com.crmHdmSamBackend.model.Transacao;
-import br.com.crmHdmSamBackend.model.enums.StatusTransacao;
-import br.com.crmHdmSamBackend.model.enums.TipoTransacao;
 import br.com.crmHdmSamBackend.service.TransacaoService; // IMPORT DO SERVICE
-import br.com.crmHdmSamBackend.views.form.TransacaoForm;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
-
-import java.text.NumberFormat;
-import java.util.Locale;
 
 @Route(value = "transacoes", layout = MainLayout.class)
 @PageTitle("Transações | FinanceApp")
