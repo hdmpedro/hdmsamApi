@@ -54,7 +54,6 @@ public class TransacaoForm extends FormLayout {
         quantia.setPrefixComponent(new Span("R$"));
         descricao.setHeight("100px");
 
-        // CONFIGURAR O BINDING DA DATA MANUALMENTE ANTES do bindInstanceFields
         binder.forField(data)
                 .withConverter(
                         // LocalDateTime -> OffsetDateTime
@@ -68,8 +67,7 @@ public class TransacaoForm extends FormLayout {
                 )
                 .bind(Transacao::getData, Transacao::setData);
 
-        // Agora bind os outros campos automaticamente
-        // IMPORTANTE: remover "data" do binding automático
+
         binder.bindInstanceFields(this);
 
         add(

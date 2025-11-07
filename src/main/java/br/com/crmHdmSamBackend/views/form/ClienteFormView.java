@@ -27,7 +27,6 @@ public class ClienteFormView extends FormLayout {
 
     private Usuario cliente;
 
-    // Campos do formulário
     TextField nome = new TextField("Nome");
     EmailField email = new EmailField("Email");
     TextField telefone = new TextField("Telefone");
@@ -35,24 +34,19 @@ public class ClienteFormView extends FormLayout {
     TextArea observacoes = new TextArea("Observações");
     Checkbox ativo = new Checkbox("Ativo");
 
-    // Botões
     Button save = new Button("Salvar");
     Button delete = new Button("Excluir");
     Button close = new Button("Cancelar");
 
-    // Binder para validação
     Binder<Usuario> binder = new BeanValidationBinder<>(Usuario.class);
 
     public ClienteFormView() {
         addClassName("cliente-form");
 
-        // Configurar Binder
         binder.bindInstanceFields(this);
 
-        // Configurar campos
         configurarCampos();
 
-        // Layout
         add(
                 nome,
                 email,
@@ -65,31 +59,25 @@ public class ClienteFormView extends FormLayout {
     }
 
     private void configurarCampos() {
-        // Nome
         nome.setRequiredIndicatorVisible(true);
         nome.setPlaceholder("Digite o nome completo");
 
-        // Email
         email.setRequiredIndicatorVisible(true);
         email.setPlaceholder("exemplo@email.com");
         email.setErrorMessage("Digite um email válido");
 
-        // Telefone
         telefone.setPlaceholder("(00) 00000-0000");
         telefone.setPattern("\\([0-9]{2}\\) [0-9]{4,5}-[0-9]{4}");
         telefone.setHelperText("Formato: (00) 00000-0000");
 
-        // Data de Nascimento
         dataNascimento.setRequiredIndicatorVisible(true);
         dataNascimento.setLocale(new Locale("pt", "BR"));
         dataNascimento.setPlaceholder("dd/MM/yyyy");
 
-        // Observações
         observacoes.setPlaceholder("Informações adicionais...");
         observacoes.setMaxLength(500);
         observacoes.setHelperText("Máximo 500 caracteres");
 
-        // Ativo
         ativo.setValue(true);
     }
 
@@ -114,7 +102,6 @@ public class ClienteFormView extends FormLayout {
         this.cliente = cliente;
         binder.readBean(cliente);
 
-        // Esconder botão delete para novos registros
         delete.setVisible(cliente != null && cliente.getId() != null);
     }
 
@@ -133,7 +120,6 @@ public class ClienteFormView extends FormLayout {
         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
     }
 
-    // Eventos customizados
     public static abstract class ClienteFormEvent extends ComponentEvent<ClienteFormView> {
         private Usuario cliente;
 

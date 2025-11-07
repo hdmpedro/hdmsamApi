@@ -51,11 +51,9 @@ public class UsuarioForm extends FormLayout {
 
     private void validateAndSave() {
         try {
-            // writeBean grava os valores do form na entidade
             binder.writeBean(usuario);
             fireEvent(new SaveEvent(this, usuario));
         } catch (ValidationException e) {
-            // Erro de validação - não faz nada
             e.printStackTrace();
         }
     }

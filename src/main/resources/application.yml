@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require
     username: postgres.hcbqigtjgwqcgwpmijrl
-    password: "uRH6e3S92EZItf84"
+    password: "HkCJv3OjRd44znDt"
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -37,3 +37,9 @@ logging:
   level:
     br.com.crmhdmSamBackend: DEBUG
     org.springframework.security: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET:mahsy-muita-segura-secreta-key-mbasd-lo-prod-min-qwe-aovb}
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
+  issuer: hdmsam-api

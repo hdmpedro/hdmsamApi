@@ -11,19 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-
-
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
@@ -75,6 +62,17 @@ public class Usuario {
 
     @Column(name = "is_admin")
     private boolean admin = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role = UserRole.USER;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TokenRenovacao> tokenRenovacaos = new ArrayList<>();
+
+    public enum UserRole {
+        USER, ADMIN
+    }
 
     public boolean isBloqueado() {
         if (bloqueadoAte == null) {
@@ -138,40 +136,134 @@ public class Usuario {
         }
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
+    public OffsetDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public void setCriadoEm(OffsetDateTime criadoEm) {
+        this.criadoEm = criadoEm;
+    }
+
+    public OffsetDateTime getUltimoLogin() {
+        return ultimoLogin;
+    }
+
+    public void setUltimoLogin(OffsetDateTime ultimoLogin) {
+        this.ultimoLogin = ultimoLogin;
+    }
+
+    public List<Categoria> getCategorias() {
+        return categorias;
+    }
+
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
+    }
+
+    public List<Transacao> getTransacoes() {
+        return transacoes;
+    }
+
+    public void setTransacoes(List<Transacao> transacoes) {
+        this.transacoes = transacoes;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public int getTentativasLogin() {
+        return tentativasLogin;
+    }
+
+    public void setTentativasLogin(int tentativasLogin) {
+        this.tentativasLogin = tentativasLogin;
+    }
+
+    public OffsetDateTime getBloqueadoAte() {
+        return bloqueadoAte;
+    }
+
+    public void setBloqueadoAte(OffsetDateTime bloqueadoAte) {
+        this.bloqueadoAte = bloqueadoAte;
+    }
+
     public boolean isAdmin() {
         return admin;
     }
 
     public void setAdmin(boolean admin) {
         this.admin = admin;
+        this.role = admin ? UserRole.ADMIN : UserRole.USER;
     }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
-    public OffsetDateTime getCriadoEm() { return criadoEm; }
-    public void setCriadoEm(OffsetDateTime criadoEm) { this.criadoEm = criadoEm; }
-    public List<Categoria> getCategorias() { return categorias; }
-    public void setCategorias(List<Categoria> categorias) { this.categorias = categorias; }
-    public List<Transacao> getTransacoes() { return transacoes; }
-    public void setTransacoes(List<Transacao> transacoes) { this.transacoes = transacoes; }
-    public String getLogin() { return login; }
-    public void setLogin(String login) { this.login = login; }
-    public String getSenha() { return senha; }
-    public void setSenha(String senha) { this.senha = senha; }
-    public OffsetDateTime getUltimoLogin() { return ultimoLogin; }
-    public void setUltimoLogin(OffsetDateTime ultimoLogin) { this.ultimoLogin = ultimoLogin; }
-    public OffsetDateTime getBloqueadoAte() { return bloqueadoAte; }
-    public void setBloqueadoAte(OffsetDateTime bloqueadoAte) { this.bloqueadoAte = bloqueadoAte; }
-    public boolean isAtivo() { return ativo; }
-    public void setAtivo(boolean ativo) { this.ativo = ativo; }
-    public int getTentativasLogin() { return tentativasLogin; }
-    public void setTentativasLogin(int tentativasLogin) { this.tentativasLogin = tentativasLogin; }
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public List<TokenRenovacao> getRefreshTokens() {
+        return tokenRenovacaos;
+    }
+
+    public void setRefreshTokens(List<TokenRenovacao> tokenRenovacaos) {
+        this.tokenRenovacaos = tokenRenovacaos;
+    }
 
     @Override
     public boolean equals(Object o) {
