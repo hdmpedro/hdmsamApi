@@ -15,9 +15,14 @@ import java.util.UUID;
 @Repository
 public interface TokenRenovacaoRepository extends JpaRepository<TokenRenovacao, UUID> {
 
+
+
+
     Optional<TokenRenovacao> findByToken(String token);
 
     List<TokenRenovacao> findByUsuarioIdAndRevogadoFalse(UUID usuarioId);
+
+    List<TokenRenovacao> findByUsuarioIdAndRevogadoFalseOrderByCriadoEmDesc(UUID usuarioId);
 
     @Modifying
     @Query("UPDATE TokenRenovacao rt SET rt.revogado = true WHERE rt.usuario.id = :usuarioId")

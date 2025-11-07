@@ -1,12 +1,13 @@
 package br.com.crmHdmSamBackend.restControllers;
 
-import br.com.crmHdmSamBackend.exception.CredenciaisInvalidasException;
-import br.com.crmHdmSamBackend.exception.InvalidRefreshTokenException;
-import br.com.crmHdmSamBackend.exception.UsuarioBloqueadoException;
-import br.com.crmHdmSamBackend.exception.UsuarioInativoException;
+import br.com.crmHdmSamBackend.exception.*;
 import br.com.crmHdmSamBackend.model.Usuario;
-import br.com.crmHdmSamBackend.model.dto.*;
-import br.com.crmHdmSamBackend.security.service.AuthService;
+import br.com.crmHdmSamBackend.model.dto.api.AuthResponse;
+import br.com.crmHdmSamBackend.model.dto.api.LoginRequest;
+import br.com.crmHdmSamBackend.model.dto.api.RenovarRequest;
+import br.com.crmHdmSamBackend.model.dto.api.TokenInfoDTO;
+import br.com.crmHdmSamBackend.security.service.ApiAuthService;
+import br.com.crmHdmSamBackend.util.IpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,44 +17,56 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/auth")
 public class ApiAuthController {
 
-    private final AuthService authService;
+    private final ApiAuthService servicoAutenticacao;
 
     @Autowired
-    public ApiAuthController(AuthService authService) {
-        this.authService = authService;
+    public ApiAuthController(ApiAuthService apiAuthService) {
+        this.servicoAutenticacao = apiAuthService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(
+            @Valid @RequestBody LoginRequest pedido,
+            HttpServletRequest httpRequest) {
         try {
-            AuthResponse response = authService.login(request.getLogin(), request.getSenha());
-            return ResponseEntity.ok(response);
-        } catch (CredenciaisInvalidasException | UsuarioInativoException | UsuarioBloqueadoException e) {
+            String enderecoIp = IpUtils.obterEnderecoIpCliente(httpRequest);
+            AuthResponse resposta = servicoAutenticacao.login(
+                    pedido.getLogin(),
+                    pedido.getSenha(),
+                    enderecoIp
+            );
+            return ResponseEntity.ok(resposta);
+        } catch (CredenciaisInvalidasException | UsuarioInativoException |
+                 UsuarioBloqueadoException | TentativasExcedidasException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
     @PostMapping("/renovar")
-    public ResponseEntity<AuthResponse> renovar(@Valid @RequestBody RenovarRequest request) {
+    public ResponseEntity<AuthResponse> renovar(@Valid @RequestBody RenovarRequest pedido) {
         try {
-            AuthResponse response = authService.refresh(request.getRenovarToken());
-            return ResponseEntity.ok(response);
+            AuthResponse resposta = servicoAutenticacao.refresh(pedido.getRenovarToken());
+            return ResponseEntity.ok(resposta);
         } catch (InvalidRefreshTokenException | UsuarioInativoException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
     @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
+        String cabecalhoAuth = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            authService.logout(token);
+        if (cabecalhoAuth != null && cabecalhoAuth.startsWith("Bearer ")) {
+            String token = cabecalhoAuth.substring(7);
+            servicoAutenticacao.logout(token);
         }
 
         return ResponseEntity.ok().build();
@@ -64,7 +77,27 @@ public class ApiAuthController {
     public ResponseEntity<Void> revogarTodos() {
         Usuario usuario = (Usuario) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
-        authService.revogarTodosTokensUsuario(usuario.getId());
+        servicoAutenticacao.revogarTodosTokensUsuario(usuario.getId());
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/tokens")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<TokenInfoDTO>> listarTokens() {
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        List<TokenInfoDTO> tokens = servicoAutenticacao.listarTokensAtivos(usuario.getId());
+        return ResponseEntity.ok(tokens);
+    }
+
+    @DeleteMapping("/tokens/{tokenId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> revogarToken(@PathVariable UUID tokenId) {
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        servicoAutenticacao.revogarTokenEspecifico(usuario.getId(), tokenId);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

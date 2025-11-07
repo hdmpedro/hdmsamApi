@@ -1,16 +1,12 @@
 package br.com.crmHdmSamBackend.security;
 import br.com.crmHdmSamBackend.model.Usuario;
 import br.com.crmHdmSamBackend.repository.UsuarioRepository;
-import br.com.crmHdmSamBackend.security.service.AuthService;
+import br.com.crmHdmSamBackend.security.service.ApiAuthService;
 import br.com.crmHdmSamBackend.security.service.JwtService;
-import br.com.crmHdmSamBackend.security.service.TentativaLoginService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,8 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -31,16 +25,16 @@ import java.util.UUID;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final AuthService authService;
+    private final ApiAuthService apiAuthService;
     private final UsuarioRepository usuarioRepository;
 
     @Autowired
     public JwtAuthenticationFilter(
             JwtService jwtService,
-            AuthService authService,
+            ApiAuthService apiAuthService,
             UsuarioRepository usuarioRepository) {
         this.jwtService = jwtService;
-        this.authService = authService;
+        this.apiAuthService = apiAuthService;
         this.usuarioRepository = usuarioRepository;
     }
 
@@ -61,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             String jti = jwtService.extrairJti(token);
 
-            if (authService.isTokenNaBlacklist(jti)) {
+            if (apiAuthService.isTokenNaBlacklist(jti)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("{\"error\": \"Token revogado\"}");

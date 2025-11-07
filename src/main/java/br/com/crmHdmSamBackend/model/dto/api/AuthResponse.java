@@ -1,4 +1,4 @@
-package br.com.crmHdmSamBackend.model.dto;
+package br.com.crmHdmSamBackend.model.dto.api;
 
 public class AuthResponse {
 
