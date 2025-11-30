@@ -91,9 +91,7 @@ public class LoginView extends VerticalLayout {
 
         AutenticacaoService.AuthenticationResult resultado =
                 autenticacaoService.autenticar(login, senha);
-        System.err.println("mensagem:"+resultado.getMensagem());
-        System.err.println("usuario"+resultado.getUsuario());
-        System.err.println("isSucesso"+resultado.isSucesso());
+
 
 
         if (resultado.isSucesso()) {

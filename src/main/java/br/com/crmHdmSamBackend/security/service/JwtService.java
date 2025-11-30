@@ -44,6 +44,7 @@ public class JwtService {
         this.secretKey = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
+
     public String gerarAccessToken(Usuario usuario) {
         Date agora = new Date();
         Date expiracao = new Date(agora.getTime() + jwtConfig.getAccessTokenExpiration());
